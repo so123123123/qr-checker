@@ -4,59 +4,53 @@
   <meta charset="UTF-8" />
   <title>음료수령 중복 체크</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #message { font-size: 1.5em; margin-top: 30px; color: green; }
-    #message.duplicate { color: red; }
-<style>
-  /* 화면 전체를 사용해서 글자를 정중앙에 위치시키기 */
-  body, html {
-    height: 100%;
-    margin: 0;
-  }
+    /* 화면 전체를 사용해서 글자 정중앙 배치 */
+    body, html {
+      height: 100%;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #333;
+    }
 
-  #message {
-    /* 화면 가로세로 중앙 정렬 */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    #message {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
 
-    /* 글자 크기와 스타일 */
-    font-size: 48px;      /* 글자 크기 크게 */
-    font-weight: bold;    /* 굵게 */
-    color: #333;          /* 진한 회색 */
-    text-align: center;   /* 가운데 정렬 */
-  }
-#claim-btn {
-  font-size: 24px;
-  padding: 10px 20px;
-  margin-top: 20px;
-  cursor: pointer;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-}
-
-#claim-btn:hover {
-  background-color: #0056b3;
-}
-
-</style>
-
+    #claim-btn {
+      font-size: 1.5em;
+      padding: 15px 40px;
+      background-color: #1976d2;
+      border: none;
+      border-radius: 50px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 8px 15px rgba(25, 118, 210, 0.3);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    #claim-btn:hover {
+      background-color: #0d47a1;
+      box-shadow: 0 12px 20px rgba(13, 71, 161, 0.5);
+    }
   </style>
 </head>
 <body>
-  <h1>음료수령 확인</h1>
+
   <div id="message">잠시만 기다려주세요...</div>
-<div id="message"></div>
-<button id="claim-btn" style="display:none;">수령하기</button>
+  <button id="claim-btn" style="display:none;">수령하기</button>
 
   <script>
-    // URL에서 'code' 파라미터 받아오기
+    // URL에서 code 파라미터 가져오기
     function getParameterByName(name) {
       const url = window.location.href;
-      name = name.replace(/[[]]/g, '\\$&');
+      name = name.replace(/[\[\]]/g, '\\$&');
       const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
       const results = regex.exec(url);
       if (!results) return null;
@@ -65,59 +59,31 @@
     }
 
     const code = getParameterByName('code') || 'default_drink';
-
-    // 로컬스토리지 키 만들기 (코드별로 구분)
     const storageKey = 'drink_received_' + code;
 
     const messageDiv = document.getElementById('message');
+    const claimBtn = document.getElementById('claim-btn');
 
-    // 중복 체크 로직
-    if(localStorage.getItem(storageKey)) {
-      // 이미 음료를 수령한 경우
-      messageDiv.textContent = '이미 음료를 수령했습니다.';
-      messageDiv.classList.add('duplicate');
-    } else {
-      // 처음 방문한 경우
-      localStorage.setItem(storageKey, 'true');
-      messageDiv.textContent = '음료 수령이 가능합니다.';
+    function updateUI() {
+      if (localStorage.getItem(storageKey)) {
+        // 이미 수령했으면
+        messageDiv.textContent = '이미 음료를 수령했습니다.';
+        claimBtn.style.display = 'none';
+      } else {
+        // 처음 방문했으면
+        messageDiv.textContent = '음료 수령이 가능합니다!';
+        claimBtn.style.display = 'inline-block';
+      }
     }
-const messageDiv = document.getElementById('message');
-const claimBtn = document.getElementById('claim-btn');
 
-function checkClaim() {
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get('code');
+    claimBtn.addEventListener('click', () => {
+      localStorage.setItem(storageKey, 'true');
+      messageDiv.textContent = '음료를 수령했습니다!';
+      claimBtn.style.display = 'none';
+    });
 
-  if (!code) {
-    messageDiv.textContent = '유효하지 않은 코드입니다.';
-    claimBtn.style.display = 'none';
-    return;
-  }
-
-  const claimed = localStorage.getItem(code);
-
-  if (claimed === 'true') {
-    messageDiv.textContent = '이미 음료를 수령했습니다.';
-    claimBtn.style.display = 'none';
-  } else {
-    messageDiv.textContent = '음료 수령이 가능합니다.';
-    claimBtn.style.display = 'inline-block';
-  }
-}
-
-// 버튼 클릭 시 실행할 함수
-claimBtn.addEventListener('click', () => {
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get('code');
-
-  localStorage.setItem(code, 'true');
-  messageDiv.textContent = '음료를 수령했습니다.';
-  claimBtn.style.display = 'none';
-});
-
-// 페이지 로드 시 상태 체크
-window.onload = checkClaim;
-
+    // 페이지 로드 시 UI 업데이트
+    window.onload = updateUI;
   </script>
 </body>
 </html>
