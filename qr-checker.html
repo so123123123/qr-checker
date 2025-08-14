@@ -27,6 +27,21 @@
     color: #333;          /* 진한 회색 */
     text-align: center;   /* 가운데 정렬 */
   }
+#claim-btn {
+  font-size: 24px;
+  padding: 10px 20px;
+  margin-top: 20px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+#claim-btn:hover {
+  background-color: #0056b3;
+}
+
 </style>
 
   </style>
@@ -34,6 +49,8 @@
 <body>
   <h1>음료수령 확인</h1>
   <div id="message">잠시만 기다려주세요...</div>
+<div id="message"></div>
+<button id="claim-btn" style="display:none;">수령하기</button>
 
   <script>
     // URL에서 'code' 파라미터 받아오기
@@ -64,6 +81,43 @@
       localStorage.setItem(storageKey, 'true');
       messageDiv.textContent = '음료 수령이 가능합니다.';
     }
+const messageDiv = document.getElementById('message');
+const claimBtn = document.getElementById('claim-btn');
+
+function checkClaim() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+
+  if (!code) {
+    messageDiv.textContent = '유효하지 않은 코드입니다.';
+    claimBtn.style.display = 'none';
+    return;
+  }
+
+  const claimed = localStorage.getItem(code);
+
+  if (claimed === 'true') {
+    messageDiv.textContent = '이미 음료를 수령했습니다.';
+    claimBtn.style.display = 'none';
+  } else {
+    messageDiv.textContent = '음료 수령이 가능합니다.';
+    claimBtn.style.display = 'inline-block';
+  }
+}
+
+// 버튼 클릭 시 실행할 함수
+claimBtn.addEventListener('click', () => {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+
+  localStorage.setItem(code, 'true');
+  messageDiv.textContent = '음료를 수령했습니다.';
+  claimBtn.style.display = 'none';
+});
+
+// 페이지 로드 시 상태 체크
+window.onload = checkClaim;
+
   </script>
 </body>
 </html>
