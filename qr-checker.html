@@ -7,6 +7,28 @@
     body { font-family: Arial, sans-serif; padding: 20px; }
     #message { font-size: 1.5em; margin-top: 30px; color: green; }
     #message.duplicate { color: red; }
+<style>
+  /* 화면 전체를 사용해서 글자를 정중앙에 위치시키기 */
+  body, html {
+    height: 100%;
+    margin: 0;
+  }
+
+  #message {
+    /* 화면 가로세로 중앙 정렬 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    /* 글자 크기와 스타일 */
+    font-size: 48px;      /* 글자 크기 크게 */
+    font-weight: bold;    /* 굵게 */
+    color: #333;          /* 진한 회색 */
+    text-align: center;   /* 가운데 정렬 */
+  }
+</style>
+
   </style>
 </head>
 <body>
